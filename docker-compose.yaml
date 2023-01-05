@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart: always
+    command: --default-authentication-plugin=caching_sha2_password
+    volumes:
+      - mysql_db_data:/var/lib/mysql
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: privy-test
+      MYSQL_ROOT_PASSWORD: secret
+
+  server_application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    networks:
+      - default
+    ports:
+    - "3030:3030"
+volumes:
+  mysql_db_data:
+    name: mysql_db_data
+  data:
+    name: data
